@@ -464,11 +464,13 @@ async function loadDirectory(){
     const q = query(
       collection(db, "users"),
       where("status", "==", "active"),
-      orderBy("lastSeen", "desc"),
       limit(200)
     );
     const snap = await getDocs(q);
-    allMembers = snap.docs.map(d => d.data()).filter(u => u.uid !== me?.uid);
+    allMembers = snap.docs
+      .map(d => d.data())
+      .filter(u => u.uid !== me?.uid)
+      .sort((a, b) => (b.lastSeen?.seconds ?? 0) - (a.lastSeen?.seconds ?? 0));
     renderDirectory();
   } catch (e) {
     list.innerHTML = `<div class="empty">Impossible de charger les membres pour le moment.</div>`;
